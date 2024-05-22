@@ -38,9 +38,7 @@ function [ err ] = mmwrite(filename,A,comment,field,precision)
 
 err = 0;
 
-if ( nargin == 5) 
-  precision = 16;
-elseif ( nargin == 4) 
+if ( nargin == 4) 
   precision = 16;
 elseif ( nargin == 3) 
   field = 'none'; % placeholder, will check after FIND-ing A
@@ -252,7 +250,7 @@ else
     fprintf(mmfile,'%%%s\n',comment(i,:));
   end;
   fprintf(mmfile,'%d %d\n',M,N);
-  cplxformat = sprintf('%% .%dg %% .%dg\n', precision,precision);
+  cplxformat = sprintf('%% .%dg %% .%dg\n', precision, precision);
   realformat = sprintf('%% .%dg\n', precision);
   if ( ~ strcmp(symm,'general') )
      rowloop = 'j';
@@ -269,6 +267,12 @@ else
      for j=1:N
        for i=eval(rowloop):M
           fprintf(mmfile,cplxformat,real(A(i,j)),imag(A(i,j)));
+       end
+     end
+  elseif ( strcmp(field,'integer') )
+     for j=1:N
+       for i=eval(rowloop):M
+          fprintf(mmfile,'%d',A(i,j));
        end
      end
   elseif ( strcmp(field,'pattern') )
