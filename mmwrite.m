@@ -142,11 +142,11 @@ if ( issparse(A) )
 
 
   fprintf(mmfile,'%%%%MatrixMarket matrix %s %s %s\n',rep,field,symm);
-  [MC,NC] = size(comment);
+  [MC,~] = size(comment);
   if ( MC == 0 )
-    fprintf(mmfile,'%% Generated %s\n',[date]);
+    fprintf(mmfile,'%% Generated %s\n', date);
   else
-    for i=1:MC,
+    for i=1:MC
       fprintf(mmfile,'%%%s\n',comment(i,:));
     end
   end
@@ -156,20 +156,23 @@ if ( issparse(A) )
   if ( strcmp(field,'real') )
      for i=1:NZ
         fprintf(mmfile,realformat,I(i),J(i),V(i));
-     end;
+     end
   elseif ( strcmp(field,'complex') )
-  for i=1:NZ
-     fprintf(mmfile,cplxformat,I(i),J(i),real(V(i)),imag(V(i)));
-  end;
+     for i=1:NZ
+         fprintf(mmfile,cplxformat,I(i),J(i),real(V(i)),imag(V(i)));
+     end
+  elseif ( strcmp(field,'integer') )
+     for i=1:NZ
+         fprintf(mmfile,'%d\n',I(i),J(i),V(i));
+     end
   elseif ( strcmp(field,'pattern') )
      for i=1:NZ
         fprintf(mmfile,'%d %d\n',I(i),J(i));
-     end;
+     end
   else  
      err = -1;
-     disp('Unsupported field:')
-     field
-  end;
+     disp(['Unsupported field: ', field])
+  end
 
 %%%%%%%%%%%%%       This part for dense matrices      %%%%%%%%%%%%%%%%
 else
@@ -244,11 +247,11 @@ else
 % Dense array format:
 
   rep = 'array';
-  [MC,NC] = size(comment);
+  MC = size(comment, 1);
   fprintf(mmfile,'%%%%MatrixMarket matrix %s %s %s\n',rep,field,symm);
-  for i=1:MC,
+  for i=1:MC
     fprintf(mmfile,'%%%s\n',comment(i,:));
-  end;
+  end
   fprintf(mmfile,'%d %d\n',M,N);
   cplxformat = sprintf('%% .%dg %% .%dg\n', precision, precision);
   realformat = sprintf('%% .%dg\n', precision);
@@ -272,16 +275,15 @@ else
   elseif ( strcmp(field,'integer') )
      for j=1:N
        for i=eval(rowloop):M
-          fprintf(mmfile,'%d',A(i,j));
+          fprintf(mmfile,'%d\n',A(i,j));
        end
      end
   elseif ( strcmp(field,'pattern') )
      err = -2
-     disp('Pattern type inconsistant with dense matrix')
+     disp('Pattern type inconsistent with dense matrix.')
   else
      err = -2
-     disp('Unknown matrix type:')
-     field
+     disp(['Unknown matrix type: ', field])
   end
 end
 
